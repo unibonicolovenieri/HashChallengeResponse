@@ -1,6 +1,8 @@
 public class Alice {
     private final String identity = "Alice";
     private final String sharedSecret;
+    private String nonce;
+    private String receivedNonce;
 
     public Alice(String sharedSecret) {
         this.sharedSecret = sharedSecret;
@@ -11,17 +13,21 @@ public class Alice {
     }
 
     public String generateNonce() {
-        return CryptoUtil.generateNonce();
+        this.nonce = CryptoUtil.generateNonce();
+        return this.nonce;
     }
 
-    public String generateResponse(String nonceA, String nonceB, String bobIdentity) throws Exception {
-        String data = nonceA + nonceB + bobIdentity + sharedSecret;
-        String hash = CryptoUtil.hashSHA256(data);
-        return nonceA + "||" + nonceB + "||" + identity + "||" + hash;
+    public void setReceivedNonce(String nonceB) {
+        this.receivedNonce = nonceB;
     }
 
-    public boolean verifyResponse(String nonceA, String nonceB, String hashReceived, String bobIdentity) throws Exception {
-        String data = nonceA + nonceB + identity + sharedSecret;
+    public String generateResponse(String bobIdentity) throws Exception {
+        String data = nonce + receivedNonce + bobIdentity + sharedSecret;
+        return CryptoUtil.hashSHA256(data);
+    }
+
+    public boolean verifyResponse(String bobIdentity, String hashReceived) throws Exception {
+        String data = nonce + receivedNonce + identity + sharedSecret;
         String expectedHash = CryptoUtil.hashSHA256(data);
         return expectedHash.equals(hashReceived);
     }
