@@ -4,7 +4,7 @@
 
 Questo progetto implementa un semplice protocollo di autenticazione mutua tra due entità, **Alice** e **Bob**, utilizzando nonce, hash SHA-256 e un segreto condiviso.
 
-Il flusso del protocollo avviene su un canale insicuro simulato in memoria (`Channel`), ma l'autenticazione si basa sull'integrità dei messaggi e la condivisione del segreto.
+Il flusso del protocollo avviene su un canale insicuro simulato in memoria (`Channel`), ma l'autenticazione si basa sull'integrità dei messaggi e la precondivisione del segreto.
 
 ---
 
