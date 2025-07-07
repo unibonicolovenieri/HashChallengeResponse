@@ -69,10 +69,9 @@ Rappresenta l'entità Bob:
 ```text
 Bob        →      Alice: CHALLENGE || nonceB
 Alice      →      Bob: RESPONSE_A || nonceA || hashA(noncea + nonceb + Bobid + secret)
+Bob        →      Alice: RESPONSE_B || hashB(nonceA + nonceB + Aliceid + secret)
 Bob verifica Alice:
            SHA-256(nonceA + nonceB + "Bobid" + secret) == hashA
-
-Bob        →      Alice: RESPONSE_B || hashB(nonceA + nonceB + Aliceid + secret)
 Alice verifica Bob:
            SHA-256(nonceA + nonceB + "Aliceid" + secret) == hashB
 ```
@@ -83,9 +82,17 @@ Alice verifica Bob:
 
 Il protocollo si basa su:
 
-- Un **segreto condiviso** predefinito e noto solo ad Alice e Bob.
-- **Nonce unici** per prevenire replay attack.
+- Un **segreto pre-condiviso** predefinito e che dovrebbe essere noto solo ad Alice e Bob.
+- **Nonce (teoricamente) unici** per prevenire replay attack.
 - **Hash SHA-256** per garantire integrità e autenticità.
+
+### Criticità
+Queste sono alcune delle criticità evidenziate, tuttavia lo scopo del progetto è riuscire a dimostrare tramite Sfida e Risposta con hash l'identificazione di due soggetti, Alice e Bob. Oltre al progetto mi sono deidicato all'analisi delle criticità sia logiche sia "*di struttura*" del programma per capirne le vulnerabilità. Chiaramente ce ne sono molte:
+- **Canale di comunicazione non sicuro** : l Channel è solo una Queue Java: non ha cifratura, autenticazione né protezione contro man-in-the-middle. Una possibile soluzione sarebbe l'implementazione di TLS o una forma di cifratura/autenticazione dei messaggi 
+- **Nonce memorizzati localmente in file semplice** : Ho memorizzato in un file i nonce utilizzati per poi al momento della creazione verificare che non vengano riutilizzare per riuscire a garantire che il nonce sia un numero casuale non riutilizzato ma tutta via mi espongo ad un ulteriore criticità ovvero un file contenete tutti i nonce utilizzati.
+- **Autenticazione basata solo su hash con secret condiviso** : L'autenticazione con l'hash avviene grazie anche ad un segreto precondiviso, se qualcuno entra in possesso di quel segreto (banalmente leggendo il codice) riesce a bucare l'intero protocollo. La soluzione possibile sarebbe l'utilizzo di HMAC-SHA256, non semplice SHA256.
+- **Mancanza di verifica dell'identità del mittente** : L'identità è una banale stringa che si può ottenere con il metodo getIdentity e dunque chiunque può entrare in possesso di quell'identità e falsificarsi come tale. Resterebbe il segreto si, ma come detto prima è banalmente visibile dal codice. Una soluzione sarebbe utilizzare certificati o firmare con una chiave privata il messaggio. E permettere al ricevente di identificarne l'arrivo tramite chiave pubblica del mittente
+
 
 ---
 
@@ -93,7 +100,7 @@ Il protocollo si basa su:
 
 Per eseguire il programma:
 
-1. Assicurati che il file `nonce_used.txt` sia scrivibile nella directory di esecuzione.
+1. Assicuratevi che il file `nonce_used.txt` sia scrivibile nella directory di esecuzione.
 2. Compila tutti i file `.java`.
 3. Esegui `Main`.
 
