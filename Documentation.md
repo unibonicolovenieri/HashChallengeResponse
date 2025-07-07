@@ -68,13 +68,13 @@ Rappresenta l'entità Bob:
 
 ```text
 Bob        →      Alice: CHALLENGE || nonceB
-Alice      →      Bob: RESPONSE_A || nonceA || nonceB || Alice || hashA
+Alice      →      Bob: RESPONSE_A || nonceA || hashA(noncea + nonceb + Bobid + secret)
 Bob verifica Alice:
-           SHA-256(nonceA + nonceB + "Bob" + secret) == hashA
+           SHA-256(nonceA + nonceB + "Bobid" + secret) == hashA
 
-Bob        →      Alice: RESPONSE_B || hashB
+Bob        →      Alice: RESPONSE_B || hashB(nonceA + nonceB + Aliceid + secret)
 Alice verifica Bob:
-           SHA-256(nonceA + nonceB + "Alice" + secret) == hashB
+           SHA-256(nonceA + nonceB + "Aliceid" + secret) == hashB
 ```
 
 ---
@@ -98,18 +98,17 @@ Per eseguire il programma:
 3. Esegui `Main`.
 
 ```bash
-javac *.java
-java Main
+  javac *.java
+  java Main
 ```
 
 ---
 
 ## Reset dei nonce
+Puoi ripulire il file dei nonce con il metodo:
 
-Puoi ripulire il file dei nonce con:
-
-```java
-CryptoUtil.resetNonceFile();
+```bash
+  CryptoUtil.resetNonceFile();
 ```
 
 ---
